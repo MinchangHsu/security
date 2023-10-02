@@ -1,0 +1,458 @@
+{
+	"info": {
+		"_postman_id": "9c478ed1-face-4e24-8d17-b9e10c3efd71",
+		"name": "Local_Security",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28817624"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "redisKey",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8081/system/login?userName=Caster&password=123123",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"system",
+						"login"
+					],
+					"query": [
+						{
+							"key": "userName",
+							"value": "Caster"
+						},
+						{
+							"key": "password",
+							"value": "123123"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "info",
+			"protocolProfileBehavior": {
+				"disableCookies": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "redisKey",
+						"value": "user:Caster",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "redisKey",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8081/system/info",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"system",
+						"info"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Insert default user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/auth",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"auth"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "auth login",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.get(\"variable_key\");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"check result\", () => {\r",
+							"    const responseJson = pm.response.json();\r",
+							"    pm.environment.set(\"token\", responseJson.result.authentication);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    // \"loginId\":\"Eunice\",\r\n    \"loginId\":\"admin\",\r\n    \"password\":\"123456\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "auth info",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"check result\", () => {\r",
+							"\r",
+							"    const xsrfToken = pm.cookies.get('XSRF-TOKEN');\r",
+							"    pm.environment.set(\"xsrfToken\", xsrfToken);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-CSRF-TOKEN",
+						"value": "{{xsrfToken}}",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Origin",
+						"value": "http://abcdefg.com:8080",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Origin",
+						"value": "http://example.com",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Origin",
+						"value": "http://google.com",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Origin",
+						"value": "http://localhost:8081",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Origin",
+						"value": "http://example",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/user/info",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"user",
+						"info"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add user",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-XSRF-TOKEN",
+						"value": "{{xsrfToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"loginId\":\"{{$randomFirstName}}\",\r\n    \"pwd\":\"123456\",\r\n    \"name\":\"{{$randomFullName}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "insert V2",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-XSRF-TOKEN",
+						"value": "{{xsrfToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"loginId\":\"{{$randomFirstName}}\",\r\n    \"pwd\":\"123456\",\r\n    \"name\":\"{{$randomFullName}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/user/V2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"user",
+						"V2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CORS system info",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-XSRF-TOKEN",
+						"value": "{{xsrfToken}}",
+						"type": "text"
+					},
+					{
+						"key": "Origin",
+						"value": "http://example.com",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/system/info",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"system",
+						"info"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
