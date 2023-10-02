@@ -1,5 +1,7 @@
 package com.caster.security.controller;
 
+import com.caster.security.enums.SuccessCodeMsg;
+import com.caster.security.model.response.JSONResult;
 import com.caster.security.service.ApiUrlService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -35,7 +37,7 @@ public class SystemController {
 
         apiUrlService.lambdaQuery().list().forEach(o -> log.debug("" + o));
 
-        return ResponseEntity.ok(RandomStringUtils.randomAlphabetic(10));
+        return ResponseEntity.ok(JSONResult.createResult(SuccessCodeMsg.COMMON_OK));
     }
 
     @RequestMapping("/errorHandle")

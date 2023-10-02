@@ -89,8 +89,8 @@ INSERT INTO role_permission (ROLE_ID, PERMISSION_ID) VALUES ((SELECT ID FROM rol
 INSERT INTO role_permission (ROLE_ID, PERMISSION_ID) VALUES ((SELECT ID FROM roles WHERE NAME = 'ROLE_SYSTEM_ADMIN'),
                                                              (SELECT ID FROM permission WHERE PERMISSION = 'AUTH_DELETE'));
 
--- 初始化使用者
-INSERT INTO user (NAME, LOGIN_ID, PWD) VALUES ('admin', 'admin', '$2a$10$iRagKWBrl1xdKerRAUePCuGiSRK3U/2lmHdbylUFn24iaxC.50KZW');
+-- 初始化使用者 pwd = 123456
+INSERT INTO user (NAME, LOGIN_ID, PWD) VALUES ('admin', 'admin', '$2a$10$CyN5ejfWo/TROrh19L5RUORQD0ozQJQdWNEZ2WLnaAS/cmiIEWpY.');
 
 -- 初始化使用者與role的關係
 INSERT INTO user_roles (USER_ID, ROLE_ID) VALUES ((SELECT ID FROM user WHERE NAME = 'admin'), (SELECT ID FROM roles WHERE NAME = 'ROLE_SYSTEM_ADMIN'));

@@ -44,19 +44,31 @@ public class AuthController {
     private final UserService userService;
 
 
+    /**
+     * POST請求處理登入的端點
+     * @param loginReq
+     * @return
+     */
     @PostMapping(value = "/login", name = "登入")
     public ResponseEntity authenticateUser(@RequestBody LoginReq loginReq) {
 
+        // 記錄登入信息
         log.trace("current login:{}", loginReq.toString());
+
+        // 使用AuthenticationManager進行身份驗證
         Authentication authentication =
                 authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginReq.getLoginId(), loginReq.getPassword()));
 
+        // 從驗證結果中獲取用戶主體
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
 
+        // 設置用戶的身份驗證信息到Spring Security的上下文中
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
+        // 通過用戶ID查詢用戶信息
         User user = userService.lambdaQuery().eq(User::getId, userPrincipal.getId()).one();
 
+        // 創建JWT Token
         JsonWebToken jwtObj = new JsonWebToken();
         Map<String, Object> extra = new HashMap<>();
 
@@ -65,9 +77,11 @@ public class AuthController {
         jwtObj.setExpireTimeMs(ConfigConstant.jwtExpirationInMs);
         jwtObj.setSecretStr(ConfigConstant.jwtSecret);
 
+        // 生成用戶的登入Token
         String loginToken = jwtProvider.generateUserLoginToken(user.getId().longValue(), jwtObj);
         log.trace("current login token:{}", loginToken);
 
+//        google OTP 驗證，後續有機會在補上
 //        boolean isNeedGoogleAuth = userService.checkEnableGoogleAuthenticator(user.getUserType());
 //
 //        if (isNeedGoogleAuth && !GoogleAuthenticatorUtil.verify(user.getGoogleAuthSecretKey(), loginReq.getGoogleValidateCode()))
@@ -78,15 +92,18 @@ public class AuthController {
 //        if (isIllegalLoginIp)
 //            return ResponseEntity.ok(JSONResult.createResult(GpErrorCodeMsg.WHITELIST_VALIDATION_CODE_ERROR));
 
+        // 更新用戶的登入信息，例如IP、最後訪問時間等
         user.setLoginIpAddress(HttpReqResUtil.getClientIpAddress())
                 .setLastAccessDate(DateTimeUtil.getNowLocal())
                 .setUpdateDate(null);
 
         userService.saveOrUpdate(user);
 
+        // 返回包含用戶信息和登入Token的回應
         return ResponseEntity
                 .ok(JSONResult.createResult(SuccessCodeMsg.COMMON_OK)
                         .addResult("userInfo", user)
                         .addResult("authentication", loginToken));
     }
 }
+

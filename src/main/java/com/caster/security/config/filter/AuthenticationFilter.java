@@ -24,6 +24,9 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * 自訂義的 Spring Security 過濾器，用於處理 JWT 驗證和使用者身份驗證。
+ */
 public class AuthenticationFilter extends OncePerRequestFilter {
     private static final Logger log = LoggerFactory.getLogger(AuthenticationFilter.class);
 
@@ -31,12 +34,27 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     private UserService userService;
     private JwtProvider jwtProvider;
 
+    /**
+     * 建構子，注入所需的服務和提供者。
+     *
+     * @param userDetailsService 用戶詳細信息服務
+     * @param userService        用戶服務
+     * @param jwtProvider        JWT 提供者
+     */
     public AuthenticationFilter(SystemUserDetailsService userDetailsService, UserService userService, JwtProvider jwtProvider) {
         this.userDetailsService = userDetailsService;
         this.userService = userService;
         this.jwtProvider = jwtProvider;
     }
 
+    /**
+     * 實現 Spring Security 的過濾器方法，處理 JWT 驗證和使用者身份驗證。
+     *
+     * @param request     HTTP 請求
+     * @param response    HTTP 響應
+     * @param filterChain 過濾器鏈
+     * @throws IOException 如果有 IO 錯誤
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws IOException {
@@ -68,6 +86,12 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
+    /**
+     * 從 HTTP 請求中獲取 JWT。
+     *
+     * @param request HTTP 請求
+     * @return 從請求中提取的 JWT 字符串，如果未找到則為 null
+     */
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
 

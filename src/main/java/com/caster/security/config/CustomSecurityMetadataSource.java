@@ -39,7 +39,10 @@ public class CustomSecurityMetadataSource implements FilterInvocationSecurityMet
                 new MPJLambdaWrapper<>().selectAll(Roles.class)
                         .innerJoin(RolePermission.class, on -> on.eq(RolePermission::getRoleId, Roles::getId))
                         .innerJoin(PermissionApi.class, on -> on.eq(PermissionApi::getPermissionId, RolePermission::getPermissionId))
-                        .innerJoin(ApiUrl.class, on -> on.eq(ApiUrl::getId, PermissionApi::getApiId).eq(ApiUrl::getApiUrl, fi.getHttpRequest().getServletPath())));
+                        .innerJoin(ApiUrl.class, on ->
+                                on.eq(ApiUrl::getId, PermissionApi::getApiId)
+                                        .eq(ApiUrl::getApiUrl, fi.getHttpRequest().getServletPath())
+                                        .eq(ApiUrl::getApiHttpMethod, fi.getHttpRequest().getMethod())));
 
         if (Objects.isNull(rolesList) || rolesList.isEmpty())
             return SecurityConfig.createList(SystemConstants.ROLE_ADMIN); // 沒有記錄此api 給予此路徑為 最高管理員權限才可訪問

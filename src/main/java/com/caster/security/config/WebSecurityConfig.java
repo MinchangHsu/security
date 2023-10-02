@@ -91,10 +91,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         final CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("*"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setExposedHeaders(Arrays.asList("*"));
+        configuration.setAllowedOrigins(Arrays.asList("http://example")); // 允許的來源
+        configuration.setAllowedMethods(Arrays.asList("*")); // 允許的HTTP方法
+        configuration.setAllowedHeaders(Arrays.asList("*")); // 允許的HTTP標頭
+        configuration.setExposedHeaders(Arrays.asList("*")); // 設定實際響應可能具有並可以公開的響應標頭列表，除了簡單標頭
 
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -113,44 +113,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/system/login")
                 .antMatchers("/auth")
                 .antMatchers("/auth/login")
-//                .antMatchers("/system/**")
                 .antMatchers("/static/**")
         ;
-    }
-
-    @Bean
-    public WebMvcConfigurer webMvcConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                //添加映射路徑
-                registry.addMapping("/**")
-                        //放行哪些原始域
-                        .allowedOriginPatterns("*")
-                        //是否發送Cookie信息
-                        .allowCredentials(true)
-                        //放行哪些原始域(請求方式)
-                        .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE")
-                //放行哪些原始域(頭部信息)
-                //.allowedHeaders("*")
-                //暴露哪些頭部信息（因為跨域訪問默認不能獲取全部頭部信息）
-                //.exposedHeaders("Header1", "Header2")
-                ;
-            }
-
-
-            /**
-             * 最終手段 !!!
-             * 手動把 HttpMessageConverter -> MappingJackson2HttpMessageConverter
-             * 移除spring boot 內建 MappingJackson2HttpMessageConverter, 再重新複寫自定義序列化的方法
-             * Bean to JsonString 自定義序列化的方法
-             * 但已經用不到了 2023/06/05 Caster
-             */
-//            @Override
-//            public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-//                converters.stream().forEach(o -> log.debug(o.toString()));
-//            }
-        };
     }
 
     @Bean
@@ -169,9 +133,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         /**
          * 可在這邊自訂義決策管理以及投票機制, 方便調整權限控制的顆粒度. 使用default spring boot security 提共的
          * 或是可自行實作 AccessDecisionManager
+         * 自定義的投票者，可以根據需要添加更多
          */
-//        return new AffirmativeBased(Arrays.asList(new CustomAccessDecisionVoter()));
-        return new AffirmativeBased(Arrays.asList(new APIPermissionVoter(userService), new UserTypeVoter(), new PublicResourceVoter()));
+        // 使用 AffirmativeBased 方式進行投票決策
+        return new AffirmativeBased(
+                Arrays.asList(
+                        new APIPermissionVoter(userService),    // Api 資源權限檢查
+                        new UserTypeVoter(),                    // 使用者類型檢查
+                        new PublicResourceVoter()));            // 公共資源檢查
     }
 
     @Bean

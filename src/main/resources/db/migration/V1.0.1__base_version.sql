@@ -127,48 +127,24 @@ create table role_permission
 ) comment '角色權限對應表';
 
 -- 使用者登入操作日誌
-CREATE TABLE IF NOT EXISTS user_action_log
+create table IF NOT EXISTS local_test.user_action_log
 (
-    ID BIGINT
-(
-    16
-) AUTO_INCREMENT PRIMARY KEY COMMENT '識別ID, 自動遞增',
-    API_URL_ID INT NOT NULL COMMENT 'api url id',
-    API_URL VARCHAR
-(
-    30
-) NOT NULL COMMENT 'Api url',
-    USER_ID INT NOT NULL COMMENT '使用者id',
-    PARAMS VARCHAR
-(
-    5000
-) NULL COMMENT '請求參數',
-    OLD_INFO VARCHAR
-(
-    5000
-) NULL COMMENT '異動前資訊',
-    NEW_INFO VARCHAR
-(
-    5000
-) NULL COMMENT '異動後資訊',
-    LOGIN_IP VARCHAR
-(
-    100
-) NOT NULL COMMENT '使用者登入ip',
-    CREATE_DATE DATETIME DEFAULT CURRENT_TIMESTAMP NULL COMMENT '操作建立日期',
-    REMARK VARCHAR
-(
-    500
-) NULL COMMENT '備註',
+    ID          bigint auto_increment comment '識別ID, 自動遞增'
+        primary key,
+    API_URL_ID  int                                not null comment 'api url id',
+    API_URL     varchar(30)                        not null comment 'Api url',
+    USER_ID     int                                not null comment '使用者id',
+    PARAMS      varchar(5000)                      null comment '請求參數',
+    OLD_INFO    varchar(5000)                      null comment '異動前資訊',
+    NEW_INFO    varchar(5000)                      null comment '異動後資訊',
+    LOGIN_IP    varchar(100)                       not null comment '使用者登入ip',
+    CREATE_DATE datetime default CURRENT_TIMESTAMP null comment '操作建立日期',
+    REMARK      varchar(500)                       null comment '備註',
     constraint user_action_log_api_url_id_fk
-    foreign key
-(
-    API_URL_ID
-) references api_url
-(
-    ID
-)
-    );
+        foreign key (API_URL_ID) references local_test.api_url (ID)
+);
+
+
 
 
 create table system_config
@@ -197,14 +173,8 @@ CREATE TABLE IF NOT EXISTS batch_process_timeout_log
     PRIMARY
     KEY,
     IDENTIFIER_CODE
-    VARCHAR
-(
-    50
-) NOT NULL comment '執行識別碼',
-    ACTION CHAR
-(
-    2
-) NOT NULL COMMENT '執行動作',
+    VARCHAR(50) NOT NULL comment '執行識別碼',
+    ACTION CHAR(2) NOT NULL COMMENT '執行動作',
     EXECUTE_DATE DATETIME NULL COMMENT '最近一次執行時間',
     EXECUTE_COUNT INT DEFAULT 0 NULL COMMENT '累積執行次數',
     MAX_EXECUTE_COUNT INT DEFAULT 10 NULL COMMENT '最大執行次數'
@@ -218,52 +188,25 @@ CREATE TABLE IF NOT EXISTS batch_process_center
     PRIMARY
     KEY,
     IDENTIFIER_CODE
-    VARCHAR
-(
-    50
-) NOT NULL comment '執行識別碼',
-    DATA VARCHAR
-(
-    1000
-) default '' NOT NULL comment '執行識別碼',
-    ACTION CHAR
-(
-    2
-) NOT NULL COMMENT '執行動作',
+    VARCHAR(50) NOT NULL comment '執行識別碼',
+    DATA VARCHAR(1000) default '' NOT NULL comment '執行識別碼',
+    ACTION CHAR(2) NOT NULL COMMENT '執行動作',
     NEXT_EXECUTE_DATE DATETIME NULL COMMENT '下一次執行的時間',
     EXECUTE_DATE DATETIME NULL COMMENT '最近一次執行時間',
     EXECUTE_COUNT INT DEFAULT 0 NULL COMMENT '累積執行次數',
     MAX_EXECUTE_COUNT INT DEFAULT 10 NULL COMMENT '最大執行次數',
     CONSTRAINT batch_process_center_IDENTIFIER_CODE_uindex
-    UNIQUE
-(
-    IDENTIFIER_CODE
-)
-    ) COMMENT '存放需要執行程式資訊';
+    UNIQUE(IDENTIFIER_CODE)
+) COMMENT '存放需要執行程式資訊';
 
 create table if not exists shedlock
 (
-    NAME VARCHAR
-(
-    64
-),
-    LOCK_UNTIL TIMESTAMP
-(
-    3
-) null,
-    LOCKED_AT TIMESTAMP
-(
-    3
-) null,
-    LOCKED_BY VARCHAR
-(
-    255
-),
-    primary key
-(
-    NAME
-)
-    );
+    NAME VARCHAR(64),
+    LOCK_UNTIL TIMESTAMP(3) null,
+    LOCKED_AT TIMESTAMP(3) null,
+    LOCKED_BY VARCHAR(255),
+    primary key(NAME)
+);
 
 
 
