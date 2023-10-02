@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ps：想使用spring擴展profile支持，要以logback-spring.xml命名，其他如property需要改為springProperty
+
+configuration: 為logback.xml配置文件的根節點,具有屬性 scan,scanPeriod,debug
+scan:    當此屬性設置為true時，配置文件如果發生改變，將會被重新加載，默認值為true。
+scanPeriod: 設置監測配置文件是否有修改的時間間隔，如果沒有給出時間單位，默認單位是毫秒。當scan為true時，此屬性生效。默認的時間間隔為1分鐘。
+debug: 當此屬性設置為true時，將打印出logback內部日志信息，實時查看logback運行狀態。默認值為false
+-->
+<configuration debug="false">
+    <contextName>ECommerce</contextName>
+
+    <!--    <springProfile name="local">-->
+    <!--        <property name="LOG_HOME" value="${user.home}/Desktop/log"/>-->
+    <!--    </springProfile>-->
+    <!--    <springProfile name="dev">-->
+    <!--        <property name="LOG_HOME" value="/ops/log"/>-->
+    <!--    </springProfile>-->
+    <!--    <springProfile name="stg">-->
+    <!--        <property name="LOG_HOME" value="/ops/log"/>-->
+    <!--    </springProfile>-->
+    <!--    <springProfile name="prod">-->
+    <!--        <property name="LOG_HOME" value="/ops/log"/>-->
+    <!--    </springProfile>-->
+
+
+    <!-- 控制台輸出 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ALL" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/MiniECommerceAll.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/archive/paymentAll_%d{yyyy-MM-dd}.log</fileNamePattern>
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="backStage" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/backStage.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/archive/backStage_%d{yyyy-MM-dd}.log</fileNamePattern>
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="errorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/errorLog.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/archive/errorLog_%d{yyyy-MM-dd}.log</fileNamePattern>
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!--
+    name: 用來指定受此logger約束的某一個包或者某一個類
+    level: 用來設定打印機別. TRACE < DEBUG < INFO < WARN < ERROR
+    additivity: 默認為true，將此logger的打印信息向上級傳遞；
+    -->
+    <!--<logger name="org.hibernate.engine.query.HQLQueryPlan" level="DEBUG" additivity="false" /> -->
+    <!--<logger name="org.springframework.boot.autoconfigure" level="DEBUG" additivity="false" />-->
+
+    <logger name="backStage" level="DEBUG" additivity="true">
+        <appender-ref ref="backStage"/>
+    </logger>
+
+    <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter" level="DEBUG" additivity="true">
+        <appender-ref ref="backStage"/>
+    </logger>
+    <logger name="org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor" level="DEBUG"
+            additivity="true">
+        <appender-ref ref="backStage"/>
+    </logger>
+
+    <logger name="errorLog" level="ERROR" additivity="true">
+        <appender-ref ref="errorLog"/>
+    </logger>
+    <logger name="org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler" level="ERROR"
+            additivity="true">
+        <appender-ref ref="errorLog"/>
+    </logger>
+
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="ALL"/>
+    </root>
+
+</configuration>
