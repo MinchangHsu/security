@@ -54,14 +54,6 @@ public class SystemController {
     public ResponseEntity test(@RequestBody JsonNode payload, HttpServletRequest request, @RequestHeader HttpHeaders headers) {
         log.debug(payload.toPrettyString());
 
-        int count = 0;
-        while(request.getHeaderNames().hasMoreElements()){
-            log.debug("header:{}", request.getHeaderNames().nextElement());
-            if(count > 10)
-                break;
-
-            count++;
-        }
 
         JsonNode mobilePhone = payload.get("mobilePhone");
         JsonNode cccc = payload.get("cccc");
