@@ -111,6 +111,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //        web.debug(true);
         web.ignoring()
                 .antMatchers("/system/login")
+                .antMatchers("/system/test")
                 .antMatchers("/auth")
                 .antMatchers("/auth/login")
                 .antMatchers("/static/**")
